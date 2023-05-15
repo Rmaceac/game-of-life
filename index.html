@@ -22,6 +22,16 @@
         throw new Error("No appropriate GPU adapter found.");
       }
 
+      // additional device options here: https://gpuweb.github.io/gpuweb/#gpudevicedescriptor
+      const device = await adapter.requestDevice();
+
+      // config canvas to be used with new device created above
+      const context = canvas.getContext("webgpu");
+      const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
+      context.configure({
+        device: device,
+        format: canvasFormat
+      })
     </script>
   </body>
 </html>
