@@ -10,8 +10,16 @@
     <script type="module">
       const canvas = document.querySelector("canvas");
 
+      // check if WebGPU is supported. Ideally, beyond simply throwing an error, the page could fall back to using WebGL
       if (!navigator.gpu) {
         throw new Error("WebGPU not supported on this browser :(")
+      }
+
+      // browser will pick a default adapter. To be more specific with adapter requirements, pass additional arguments to requestAdapter()
+      // Adapter Selection docs: https://gpuweb.github.io/gpuweb/#adapter-selection
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) {
+        throw new Error("No appropriate GPU adapter found.");
       }
 
     </script>
