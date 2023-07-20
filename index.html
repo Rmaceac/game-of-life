@@ -12,26 +12,47 @@
 
       // check if WebGPU is supported. Ideally, beyond simply throwing an error, the page could fall back to using WebGL
       if (!navigator.gpu) {
-        throw new Error("WebGPU not supported on this browser :(")
-      }
+        throw new Error("WebGPU not supported on this browser :(");
+      };
 
       // browser will pick a default adapter. To be more specific with adapter requirements, pass additional arguments to requestAdapter()
       // Adapter Selection docs: https://gpuweb.github.io/gpuweb/#adapter-selection
       const adapter = await navigator.gpu.requestAdapter();
       if (!adapter) {
         throw new Error("No appropriate GPU adapter found.");
-      }
+      };
 
       // additional device options here: https://gpuweb.github.io/gpuweb/#gpudevicedescriptor
       const device = await adapter.requestDevice();
 
       // config canvas to be used with new device created above
       const context = canvas.getContext("webgpu");
+      // make sure to use the device's preferred format to avoid creating memory copies.
+      // getPreferredCanvasFormat() accomplishes this fairly easily and is very often the best way to find the right canvas format.
       const canvasFormat = navigator.gpu.getPreferredCanvasFormat();
       context.configure({
         device: device,
         format: canvasFormat
-      })
+      });
+
+      // provide an interface for recording GPU commands, typically related to rendering
+      const encoder = device.createCommandEncoder();
+
+      // clear the canvas with a solid colour
+      const pass = encoder.beginRenderPass({
+        colorAttachments: [{
+          // returns a texture with a pixel width and height matching the canvas's width and height attributes and the canvas format
+           view: context.getCurrentTexture().createView(),
+           loadOp: "clear",
+           // save drawing results to the texture
+           storeOp: "store",
+        }]
+      });
+      pass.end();
+
+      // queue performs all GPU commands
+      device.queue.submit([encoder.finish()]);      
+      
     </script>
   </body>
 </html>
