@@ -44,6 +44,9 @@
           // returns a texture with a pixel width and height matching the canvas's width and height attributes and the canvas format
            view: context.getCurrentTexture().createView(),
            loadOp: "clear",
+           // RGBA values, where A is transparency (alpha). Can also be set as an object with r,g,b & a properties
+           // ie. { r: 0, g: 0.5, b: 0.7, a: 1 }
+           clearValue: [0, 0.5, 0.7, 1],
            // save drawing results to the texture
            storeOp: "store",
         }]
