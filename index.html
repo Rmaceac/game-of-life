@@ -35,6 +35,43 @@
         format: canvasFormat
       });
 
+      const vertices = new Float32Array([
+        // two triangles (made of 3 vertices coords each) form a squre
+        // Index Buffers can be used for for complex geometry
+        // X,    Y,
+        -0.8, -0.8, // Triangle 1
+         0.8, -0.8,
+         0.8,  0.8,
+
+        -0.8, -0.8, // Triangle 2
+         0.8,  0.8,
+        -0.8,  0.8,
+      ]);
+
+      // create vertex buffer, which is a block of memory that is easily accessible to the GPU
+      // and is flagged for specific purposes
+      const vertexBuffer = device.createBuffer({
+        label: "Cell vertices",
+        size: vertices.byteLength,
+        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
+      });
+
+      const vertexBufferLayout = {
+        arrayStride: 8,
+        attributes: [{
+          format: "float32x2",
+          offset: 0,
+          shaderLocation: 0, // Position, see vertex shader
+        }],
+      };
+
+      const cellShaderModule = device.createShaderModule({
+        label: "Cell shader",
+        code: `
+          // Your shader code will go here
+        `
+      });
+
       // provide an interface for recording GPU commands, typically related to rendering
       const encoder = device.createCommandEncoder();
 
@@ -54,7 +91,8 @@
       pass.end();
 
       // queue performs all GPU commands
-      device.queue.submit([encoder.finish()]);      
+      device.queue.submit([encoder.finish()]);
+      device.queue.writeBuffer(vertexBuffer, /*bufferOffset=*/0, vertices);
       
     </script>
   </body>
