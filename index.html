@@ -68,19 +68,39 @@
       const cellShaderModule = device.createShaderModule({
         label: "Cell shader",
         code: `
-          // vertex shader is run for each triangle, taking in vertex locations
+          // vertex shader is run for each triangle, taking in vertex locations.
           @vertex
           fn vertexMain(@location(0), pos: vec2f) ->
             @builtin(position) vec4f {
             return vec4f(pos, 0, 1); // (X, Y, Z, W)
           }
           
-          // fragment shader is run for each pixel. returns a color
+          // fragment shader is run for each pixel. returns a color.
+          // in this case, it sets every pixel for every triangle to red.
           @fragment
           fn fragmentMain() -> @location(0) vec4f {
             return vec4f(1, 0, 0, 1); // Red, Green, Blue, Alpha
           }
+          
+          
         `
+      });
+      
+      const cellPipeline = device.createRenderPipeline({
+        label: "Cell pipeline",
+        layout: "auto",
+        vertex: {
+          module: cellShaderModule,
+          entryPoint: "vertexMain",
+          buffers: [vertexBufferLayout]
+        },
+        fragment: {
+          module: cellShaderModule,
+          entryPoint: "fragmentMain",
+          targets: [{
+            format: canvasFormat
+          }]
+        }
       });
       
       
