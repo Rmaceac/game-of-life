@@ -68,13 +68,22 @@
       const cellShaderModule = device.createShaderModule({
         label: "Cell shader",
         code: `
+          // vertex shader is run for each triangle, taking in vertex locations
           @vertex
           fn vertexMain(@location(0), pos: vec2f) ->
             @builtin(position) vec4f {
             return vec4f(pos, 0, 1); // (X, Y, Z, W)
           }
+          
+          // fragment shader is run for each pixel. returns a color
+          @fragment
+          fn fragmentMain() -> @location(0) vec4f {
+            return vec4f(1, 0, 0, 1); // Red, Green, Blue, Alpha
+          }
         `
       });
+      
+      
       
       // provide an interface for recording GPU commands, typically related to rendering
       const encoder = device.createCommandEncoder();
